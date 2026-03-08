@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirigiendo...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: white; }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen">
+
+    <div class="text-center">
+        <p class="text-green-500 text-sm font-bold tracking-widest uppercase mb-4">Redirigiendo al stream</p>
+        <h1 class="text-3xl font-bold mb-8">{{ match_title }}</h1>
+        
+        <a href="{{ stream_url }}" target="_blank" 
+           class="bg-green-600 hover:bg-green-500 text-white font-bold py-3 px-8 rounded-lg inline-flex items-center transition shadow-lg shadow-green-900/20">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            Ir al Stream
+        </a>
+
+        <p class="mt-8 text-xs text-gray-500 max-w-sm mx-auto">
+            Esta web no aloja ningún contenido. Los enlaces son proporcionados por terceros.
+        </p>
+    </div>
+
+</body>
+</html>s

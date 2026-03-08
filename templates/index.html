@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partidos en Vivo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #080808; color: white; font-family: sans-serif; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <h1 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-200 tracking-wide uppercase">
+            Programación de Hoy
+        </h1>
+        
+        <h2 class="text-center text-gray-400 text-sm md:text-base mb-8">
+            Si los streams de la Opción 1 no funcionan, selecciona <span class="text-green-500 font-bold">Más Partidos</span>
+        </h2>
+
+        <div class="flex justify-center space-x-4 mb-8 border-b border-gray-800 pb-4">
+            <button id="btn-opcion1" onclick="cambiarPestana('opcion1')" 
+                    class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200">
+                Opción 1
+            </button>
+            
+            <button id="btn-maspartidos" onclick="cambiarPestana('maspartidos')" 
+                    class="px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200">
+                Más Partidos
+            </button>
+        </div>
+
+        <div id="contenedor-opcion1" class="block">
+            {% set hay_opcion1 = false %}
+            
+            {% for match in matches %}
+                {% if match.source == 'Tarjeta Roja' %}
+                    {% set hay_opcion1 = true %}
+                    <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
+                        <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
+                             onclick="document.getElementById('links-1-{{ loop.index }}').classList.toggle('hidden')">
+                            <div class="flex items-center space-x-4 w-3/4">
+                                <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
+                            </div>
+                            <div class="flex items-center justify-end space-x-3 w-1/4">
+                                <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+
+                        <div id="links-1-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
+                            <div class="space-y-2">
+                                {% for opcion in match.options %}
+                                <a href="/redirect?url={{ opcion.link }}&match={{ match.match_name }}" class="flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-green-500 text-xs">((•))</span>
+                                        <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
+                                    </div>
+                                    <div class="bg-[#1a1a1a] group-hover:bg-green-600 transition p-1.5 rounded text-gray-400 group-hover:text-white">
+                                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+
+            {% if not matches %}
+                <div class="text-center p-10 bg-[#111111] rounded-xl border border-gray-800"><p class="text-gray-400">Buscando partidos disponibles...</p></div>
+            {% endif %}
+        </div>
+
+
+        <div id="contenedor-maspartidos" class="hidden">
+            {% set hay_mas = false %}
+            
+            {% for match in matches %}
+                {% if match.source != 'Tarjeta Roja' %}
+                    {% set hay_mas = true %}
+                    <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
+                        <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
+                             onclick="document.getElementById('links-2-{{ loop.index }}').classList.toggle('hidden')">
+                            <div class="flex items-center space-x-4 w-3/4">
+                                <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
+                            </div>
+                            <div class="flex items-center justify-end space-x-3 w-1/4">
+                                <span class="px-2 py-1 text-[10px] font-bold uppercase text-blue-400 bg-blue-900/20 border border-blue-800/50 rounded">{{ match.source }}</span>
+                                <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
+                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+
+                        <div id="links-2-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
+                            <div class="space-y-2">
+                                {% for opcion in match.options %}
+                                <a href="/redirect?url={{ opcion.link }}&match={{ match.match_name }}" class="flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group">
+                                    <div class="flex items-center space-x-3">
+                                        <span class="text-green-500 text-xs">((•))</span>
+                                        <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
+                                    </div>
+                                    <div class="bg-[#1a1a1a] group-hover:bg-green-600 transition p-1.5 rounded text-gray-400 group-hover:text-white">
+                                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                                    </div>
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <script>
+        function cambiarPestana(pestana) {
+            // Contenedores
+            const contOpcion1 = document.getElementById('contenedor-opcion1');
+            const contMasPartidos = document.getElementById('contenedor-maspartidos');
+            
+            // Botones
+            const btnOpcion1 = document.getElementById('btn-opcion1');
+            const btnMasPartidos = document.getElementById('btn-maspartidos');
+
+            // Clases para el botón activo (verde) y el inactivo (oscuro)
+            const claseActivo = "px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200";
+            const claseInactivo = "px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200";
+
+            if (pestana === 'opcion1') {
+                contOpcion1.classList.remove('hidden');
+                contMasPartidos.classList.add('hidden');
+                btnOpcion1.className = claseActivo;
+                btnMasPartidos.className = claseInactivo;
+            } else {
+                contOpcion1.classList.add('hidden');
+                contMasPartidos.classList.remove('hidden');
+                btnOpcion1.className = claseInactivo;
+                btnMasPartidos.className = claseActivo;
+            }
+        }
+    </script>
+
+</body>
+</html>
