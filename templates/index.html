@@ -18,7 +18,7 @@
         </h1>
         
         <h2 class="text-center text-gray-400 text-sm md:text-base mb-8">
-            Si los streams de la Opción 1 no funcionan, selecciona <span class="text-green-500 font-bold">Más Partidos</span>
+            Si los streams de la Opción 1 no funcionan, selecciona <span class="text-green-500 font-bold">Opción 2</span>
         </h2>
 
         <div class="flex justify-center space-x-4 mb-8 border-b border-gray-800 pb-4">
@@ -27,9 +27,9 @@
                 Opción 1
             </button>
             
-            <button id="btn-maspartidos" onclick="cambiarPestana('maspartidos')" 
+            <button id="btn-opcion2" onclick="cambiarPestana('opcion2')" 
                     class="px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200">
-                Más Partidos
+                Opción 2
             </button>
         </div>
 
@@ -37,7 +37,7 @@
             {% set hay_opcion1 = false %}
             
             {% for match in matches %}
-                {% if match.source == 'Tarjeta Roja' %}
+                {% if match.source == 'Futbol Libre' %}
                     {% set hay_opcion1 = true %}
                     <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
                         <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
@@ -80,7 +80,7 @@
             {% set hay_mas = false %}
             
             {% for match in matches %}
-                {% if match.source != 'Tarjeta Roja' %}
+                {% if match.source != 'Futbol Libre' %}
                     {% set hay_mas = true %}
                     <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
                         <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
@@ -89,7 +89,6 @@
                                 <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
                             </div>
                             <div class="flex items-center justify-end space-x-3 w-1/4">
-                                <span class="px-2 py-1 text-[10px] font-bold uppercase text-blue-400 bg-blue-900/20 border border-blue-800/50 rounded">{{ match.source }}</span>
                                 <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
                                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </div>

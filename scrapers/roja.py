@@ -4,20 +4,56 @@ from models.match import Match
 
 # Función para usar MÁS ADELANTE (solo cuando el usuario haga click)
 def obtener_iframe(url_canal):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    if not url_canal.startswith('http'):
-        return url_canal 
-        
+    # Usar headers más parecidos a un navegador real para evitar respuestas distintas
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        # Referer puede influir en el contenido que el servidor devuelve
+        "Referer": "https://www.futbollibre.net.pe/",
+        "Connection": "close",
+    }
+
+    if not url_canal or not url_canal.startswith('http'):
+        return url_canal
+
+    # Si la URL contiene un parámetro `r` (base64) intentamos decodificarlo
     try:
-        res = requests.get(url_canal, headers=headers, timeout=5)
+        from urllib.parse import urlparse, parse_qs, unquote
+        import base64
+
+        parsed = urlparse(url_canal)
+        qs = parse_qs(parsed.query)
+        if 'r' in qs and qs['r']:
+            rval = qs['r'][0]
+            # algunos valores usan URL-safe base64, añadir padding si falta
+            try:
+                padding = '=' * (-len(rval) % 4)
+                decoded = base64.urlsafe_b64decode(rval + padding).decode('utf-8')
+                decoded = unquote(decoded)
+                if decoded.startswith('http'):
+                    return decoded
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+    try:
+        res = requests.get(url_canal, headers=headers, timeout=8, allow_redirects=True)
         if res.status_code == 200:
             soup = BeautifulSoup(res.text, 'html.parser')
-            iframe = soup.find('iframe')
+            # intentar primero buscar por id conocido
+            iframe = soup.find('iframe', id='embedIframe') or soup.find('iframe')
             if iframe and 'src' in iframe.attrs:
-                return iframe['src'] 
+                src = iframe['src']
+                # si el src es relativo, convertir a absoluto usando la base
+                if src.startswith('/'):
+                    from urllib.parse import urljoin
+                    return urljoin(url_canal, src)
+                return src
     except Exception as e:
         print(f"Error extrayendo iframe: {e}")
-    
+
     return url_canal
 
 def scrape_roja():
@@ -43,6 +79,7 @@ def scrape_roja():
                 
                 match_name = a_tag.text.replace(match_time, '').strip().strip('"').strip()
                 partido = Match(match_name, match_time)
+                
                 
                 sub_ul = li.find('ul')
                 if sub_ul:

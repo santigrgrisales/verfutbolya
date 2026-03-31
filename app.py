@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from scrapers.roja import scrape_roja, obtener_iframe
+from scrapers.futbollibre import scrape_futbollibre
 import time
 
 app = Flask(__name__)
@@ -15,8 +16,16 @@ def index():
     
     # Carga súper rápida: Solo entra a la página principal 1 vez cada 15 min
     if tiempo_actual - ultimo_scrape > TIEMPO_CACHE or not cache_partidos:
-        print("Obteniendo lista de partidos...")
-        cache_partidos = scrape_roja()
+        print("Obteniendo lista de partidos desde Tarjeta Roja y Futbol Libre...")
+        lista_roja = scrape_roja()
+        lista_fl = scrape_futbollibre()
+        # combinar listas: poner Futbol Libre primero (Opción 1), luego Tarjeta Roja
+        cache_partidos = []
+        # asegurarse de mantener objetos Match
+        if lista_fl:
+            cache_partidos.extend(lista_fl)
+        if lista_roja:
+            cache_partidos.extend(lista_roja)
         ultimo_scrape = tiempo_actual
 
     return render_template('index.html', matches=cache_partidos)
