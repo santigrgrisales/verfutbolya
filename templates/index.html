@@ -22,15 +22,19 @@
         </h2>
 
         <div class="flex justify-center space-x-4 mb-8 border-b border-gray-800 pb-4">
+            {% if availability['Futbol Libre'] %}
             <button id="btn-opcion1" onclick="cambiarPestana('opcion1')" 
                     class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200">
                 Opción 1
             </button>
-            
+            {% endif %}
+
+            {% if availability['Tarjeta Roja'] %}
             <button id="btn-opcion2" onclick="cambiarPestana('opcion2')" 
                     class="px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200">
                 Opción 2
             </button>
+            {% endif %}
         </div>
 
         <div id="contenedor-opcion1" class="block">
@@ -116,32 +120,43 @@
 
     </div>
 
+    <script id="scrapers-availability" type="application/json">
+        {{ {"fl": availability['Futbol Libre'], "tr": availability['Tarjeta Roja']} | tojson }}
+    </script>
+
     <script>
+        // Parse availability JSON from a non-JS script tag to avoid editor/linters parsing Jinja
+        const scrapersAvailability = JSON.parse(document.getElementById('scrapers-availability').textContent || '{}');
+
         function cambiarPestana(pestana) {
-            // Contenedores
             const contOpcion1 = document.getElementById('contenedor-opcion1');
             const contMasPartidos = document.getElementById('contenedor-maspartidos');
-            
-            // Botones
             const btnOpcion1 = document.getElementById('btn-opcion1');
-            const btnMasPartidos = document.getElementById('btn-maspartidos');
+            const btnMasPartidos = document.getElementById('btn-opcion2');
 
-            // Clases para el botón activo (verde) y el inactivo (oscuro)
             const claseActivo = "px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200";
             const claseInactivo = "px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200";
 
             if (pestana === 'opcion1') {
-                contOpcion1.classList.remove('hidden');
-                contMasPartidos.classList.add('hidden');
-                btnOpcion1.className = claseActivo;
-                btnMasPartidos.className = claseInactivo;
+                if (contOpcion1) contOpcion1.classList.remove('hidden');
+                if (contMasPartidos) contMasPartidos.classList.add('hidden');
+                if (btnOpcion1) btnOpcion1.className = claseActivo;
+                if (btnMasPartidos) btnMasPartidos.className = claseInactivo;
             } else {
-                contOpcion1.classList.add('hidden');
-                contMasPartidos.classList.remove('hidden');
-                btnOpcion1.className = claseInactivo;
-                btnMasPartidos.className = claseActivo;
+                if (contOpcion1) contOpcion1.classList.add('hidden');
+                if (contMasPartidos) contMasPartidos.classList.remove('hidden');
+                if (btnOpcion1) btnOpcion1.className = claseInactivo;
+                if (btnMasPartidos) btnMasPartidos.className = claseActivo;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function(){
+            if (scrapersAvailability.fl) {
+                cambiarPestana('opcion1');
+            } else if (scrapersAvailability.tr) {
+                cambiarPestana('opcion2');
+            }
+        });
     </script>
 
 </body>
