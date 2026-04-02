@@ -38,6 +38,8 @@ LEAGUE_NORMALIZATION: Dict[str, str] = {
     # common transliteration variants -> readable names
     'kubok': 'Copa',
     'seriia': 'Serie',
+    'turnir': 'Tournament',
+    'medunarodnyj': 'International',
     'seria': 'Serie',
     'seriya': 'Serie',
     'serija': 'Serie',
@@ -79,20 +81,51 @@ LEAGUE_NORMALIZATION: Dict[str, str] = {
 }
 
 
-def _transliterate_if_cyrillic(s: str) -> str:
+def _safe_transliterate(s: str) -> str:
+    """Transliterate Cyrillic -> Latin with simple sanity checks.
+
+    Uses `translit` then `unidecode` as fallback. Rejects candidates that
+    contain suspicious isolated uppercase letters inside words (e.g. "MeFdun...")
+    and falls back to the other candidate when detected.
+    """
     if not s:
         return s
     try:
-        if re.search(r'[\u0400-\u04FF]', s):
-            if translit:
-                try:
-                    return translit(s, 'ru', reversed=True)
-                except Exception:
-                    return unidecode(s)
-            return unidecode(s)
+        # only attempt on Cyrillic-containing strings
+        if not re.search(r'[\u0400-\u04FF]', s):
+            return s
+
+        cand_translit = None
+        if translit:
+            try:
+                cand_translit = translit(s, 'ru', reversed=True)
+            except Exception:
+                cand_translit = None
+
+        cand_unidecode = None
+        try:
+            cand_unidecode = unidecode(s)
+        except Exception:
+            cand_unidecode = None
+
+        # heuristic: reject candidate if it contains a single ASCII uppercase
+        # letter between lowercase letters (common artifact seen as 'F').
+        def looks_bad(c: str) -> bool:
+            if not c:
+                return True
+            if re.search(r'(?<=\w)[A-Z](?=\w)', c):
+                return True
+            return False
+
+        # prefer translit if present and looks sane, else unidecode
+        if cand_translit and not looks_bad(cand_translit):
+            return cand_translit
+        if cand_unidecode and not looks_bad(cand_unidecode):
+            return cand_unidecode
+        # last resort: return whichever is non-empty (prefer unidecode)
+        return cand_unidecode or cand_translit or s
     except Exception:
-        pass
-    return s
+        return s
 
 
 def normalize_league_name(text: str) -> str:
@@ -100,7 +133,7 @@ def normalize_league_name(text: str) -> str:
         return text
     out = text
     # transliterate first to improve matching
-    out = _transliterate_if_cyrillic(out)
+    out = _safe_transliterate(out)
     # remove stray apostrophes inside words produced by transliteration (e.g. Nas'onal')
     out = re.sub(r"(?<=\w)['’`]+(?=\w)", '', out)
     low = out.lower()
@@ -122,7 +155,13 @@ TEAM_NORMALIZATION: Dict[str, str] = {
     'barselona': 'Barcelona',
     'jun': 'United',
     "kembrid": "Cambridge",
+    'brazilija': 'Brazil',
+    'portugalija': 'Portugal',
+    'saragosa': 'Zaragoza',
+    'lion': 'Lyon',
+    'volfsburg': 'Wolfsburg',
     'kastelon': 'Castellón',
+    'shapekoense': 'Chapecoense',
     'bojaka chiko': 'Boyacá Chicó',
     'sentral': 'Central',
     'suindon': 'Swindon',
@@ -154,7 +193,7 @@ def normalize_team_name(text: str) -> str:
         return text
     out = text
     # transliterate first to improve matching
-    out = _transliterate_if_cyrillic(out)
+    out = _safe_transliterate(out)
     # aggressively remove apostrophe-like characters produced by transliteration
     out = re.sub(r'["\'’`´]', '', out)
     low = out.lower()
