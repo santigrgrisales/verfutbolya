@@ -123,6 +123,7 @@ TEAM_NORMALIZATION: Dict[str, str] = {
     'jun': 'United',
     "kembrid": "Cambridge",
     'kastelon': 'Castellón',
+    'bojaka chiko': 'Boyacá Chicó',
     'sentral': 'Central',
     'suindon': 'Swindon',
     'perejra': 'Pereira',
