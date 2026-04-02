@@ -36,6 +36,23 @@ def redirect_page():
     # Render redirect page with resolved stream URL (not exposing original in URL when POST used)
     return render_template('redirect.html', stream_url=stream_url_real, match_title=match_title)
 
+
+@app.route('/embed', methods=['GET', 'POST'])
+def embed_page():
+    # Prefer POST to avoid exposing stream URL in querystring, but accept GET for convenience
+    if request.method == 'POST':
+        stream_url = request.form.get('stream_url')
+        match_title = request.form.get('match_title', 'Partido en Vivo')
+    else:
+        stream_url = request.args.get('stream_url')
+        match_title = request.args.get('match_title', 'Partido en Vivo')
+
+    # Basic sanity: if no stream URL provided, render a small message
+    if not stream_url:
+        return "No stream URL provided", 400
+
+    return render_template('embed.html', stream_url=stream_url, match_title=match_title)
+
 if __name__ == '__main__':
     # SOLUCIÓN: Forzamos a Flask a usar el puerto 8000 para evitar el conflicto con el PID 4
     app.run(debug=True, port=8000)

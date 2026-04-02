@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ match_title }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0d1117; color: white; }
+        .player-wrap { max-width: 1200px; margin: 0 auto; }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body class="min-h-screen pt-8 pb-12">
+
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-6">
+            <p class="text-green-500 text-sm font-bold tracking-widest uppercase mb-2">Reproductor embebido</p>
+            <h1 class="text-2xl font-bold">{{ match_title }}</h1>
+        </div>
+
+        <div class="player-wrap bg-black rounded-lg overflow-hidden shadow-lg">
+            <div class="w-full" style="height:64vh;">
+                <iframe src="{{ stream_url }}" frameborder="0" allowfullscreen class="w-full h-full"></iframe>
+            </div>
+        </div>
+
+        <div class="mt-6 text-center">
+            <a href="{{ stream_url }}" target="_blank" class="text-sm text-gray-400 underline">Abrir en nueva pestaña</a>
+        </div>
+
+        <div class="mt-6 text-center text-xs text-gray-500">
+            Esta web no aloja contenido; los enlaces son de terceros.
+        </div>
+    </div>
+
+</body>
+</html>
