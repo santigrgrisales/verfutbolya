@@ -18,7 +18,7 @@
         </h1>
         
         <h2 class="text-center text-gray-400 text-sm md:text-base mb-8">
-            Si los streams de la Opción 1 no funcionan, selecciona <span class="text-green-500 font-bold">Opción 2</span>
+            Si un stream falla, prueba otra opción disponible (Opción 1 / Opción 2 / Opción 3).
         </h2>
 
         <div class="flex justify-center space-x-4 mb-8 border-b border-gray-800 pb-4">
@@ -65,7 +65,7 @@
                         <div id="links-1-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
                             <div class="space-y-2">
                                 {% for opcion in match.options %}
-                                <a href="/redirect?url={{ opcion.link }}&match={{ match.match_name }}&src={{ match.source_id }}" class="flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group">
+                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
                                     <div class="flex items-center space-x-3">
                                         <span class="text-green-500 text-xs">((•))</span>
                                         <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
@@ -108,7 +108,7 @@
                         <div id="links-2-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
                             <div class="space-y-2">
                                 {% for opcion in match.options %}
-                                <a href="/redirect?url={{ opcion.link }}&match={{ match.match_name }}&src={{ match.source_id }}" class="flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group">
+                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
                                     <div class="flex items-center space-x-3">
                                         <span class="text-green-500 text-xs">((•))</span>
                                         <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
@@ -148,7 +148,7 @@
                             {% endif %}
                             <div class="space-y-2">
                                 {% for opcion in match.options %}
-                                <a href="/redirect?url={{ opcion.link }}&match={{ match.match_name }}&src={{ match.source_id }}" class="flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group">
+                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
                                     <div class="flex items-center space-x-3">
                                         <span class="text-green-500 text-xs">((•))</span>
                                         <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
@@ -174,6 +174,36 @@
     <script>
         // Parse availability JSON from a non-JS script tag to avoid editor/linters parsing Jinja
         const scrapersAvailability = JSON.parse(document.getElementById('scrapers-availability').textContent || '{}');
+
+        // Send redirect params via POST to avoid exposing target URL in browser address bar
+        function postRedirect(url, match, src) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/redirect';
+            function add(name, value) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = name;
+                inp.value = value || '';
+                form.appendChild(inp);
+            }
+            add('url', url);
+            add('match', match);
+            add('src', src);
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Delegated click handler for links with `redirect-link` class.
+        document.addEventListener('click', function (ev) {
+            const a = ev.target.closest && ev.target.closest('.redirect-link');
+            if (!a) return;
+            ev.preventDefault();
+            const url = a.getAttribute('data-url') || '';
+            const match = a.getAttribute('data-match') || '';
+            const src = a.getAttribute('data-src') || '';
+            postRedirect(url, match, src);
+        });
 
         function cambiarPestana(pestana) {
                 const contOpcion1 = document.getElementById('contenedor-opcion1');
