@@ -4,6 +4,9 @@ from scrapers.playerhd import obtener_iframe_playerhd
 from services.scraper_manager import get_all
 
 import time
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
 
 app = Flask(__name__)
 
@@ -32,6 +35,35 @@ def redirect_page():
         stream_url_real = obtener_iframe_playerhd(url_original)
     else:
         stream_url_real = obtener_iframe(url_original)
+
+    # If resolved URL looks like a YouTube script or non-embeddable JS (e.g. contains ytembeds),
+    # try to re-resolve by fetching the original page and looking for an iframe or webplayer page.
+    try:
+        if stream_url_real and ("/ytembeds/" in stream_url_real or (stream_url_real.endswith('.js') and 'youtube.com' in stream_url_real)):
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            r = requests.get(url_original, headers=headers, timeout=6)
+            if r.status_code == 200 and r.text:
+                soup = BeautifulSoup(r.text, 'html.parser')
+                # Prefer iframe if present
+                iframe = soup.find('iframe')
+                if iframe and iframe.get('src'):
+                    candidate = iframe.get('src')
+                    stream_url_real = candidate if candidate.startswith('http') else urljoin(url_original, candidate)
+                else:
+                    # look for links to webplayer2.php or similar endpoints
+                    found = None
+                    for a in soup.select('a[href]'):
+                        href = a.get('href')
+                        if not href:
+                            continue
+                        if any(x in href for x in ('webplayer2.php', 'export/webmasters.php', 'gowm.php', 'webplayer.php')):
+                            found = href
+                            break
+                    if found:
+                        stream_url_real = found if found.startswith('http') else urljoin(url_original, found)
+    except Exception:
+        # non-fatal: keep original resolved URL
+        pass
 
     # Render redirect page with resolved stream URL (not exposing original in URL when POST used)
     return render_template('redirect.html', stream_url=stream_url_real, match_title=match_title)
