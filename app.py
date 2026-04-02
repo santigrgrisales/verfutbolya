@@ -15,21 +15,25 @@ def index():
     print('[app] availability:', availability)
     return render_template('index.html', matches=matches, availability=availability)
 
-@app.route('/redirect')
+@app.route('/redirect', methods=['GET', 'POST'])
 def redirect_page():
-    # 1. Recibimos el link original (ej. tarjeta-roja.com/canal-1)
-    url_original = request.args.get('url')
-    match_title = request.args.get('match', 'Partido en Vivo')
+    # Accept both GET (backwards compatibility) and POST (to avoid exposing URL in querystring)
+    if request.method == 'POST':
+        url_original = request.form.get('url')
+        match_title = request.form.get('match', 'Partido en Vivo')
+        src = request.form.get('src', '')
+    else:
+        url_original = request.args.get('url')
+        match_title = request.args.get('match', 'Partido en Vivo')
+        src = request.args.get('src', '')
 
-    # 2. Obtener el iframe (resolución lazy cuando el usuario hace click)
-    src = request.args.get('src', '')
     # dispatch to appropriate resolver based on source id
     if src == 'playerhd':
         stream_url_real = obtener_iframe_playerhd(url_original)
     else:
         stream_url_real = obtener_iframe(url_original)
 
-    # 3. Mandamos el link real a nuestra plantilla de redirección
+    # Render redirect page with resolved stream URL (not exposing original in URL when POST used)
     return render_template('redirect.html', stream_url=stream_url_real, match_title=match_title)
 
 if __name__ == '__main__':
