@@ -13,7 +13,7 @@
 </head>
 <body class="min-h-screen flex flex-col">
     
-    <header class="glass-header sticky top-0 z-50 w-full">
+    <header id="site-header" class="glass-header sticky top-0 z-50 w-full">
         <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 <a href="javascript:history.back()" class="text-slate-400 hover:text-white transition flex items-center justify-center p-1.5 rounded-md hover:bg-slate-800">
@@ -47,5 +47,56 @@
             </a>
         </div>
     </main>
+
+    <script>
+        // Measure header height and set CSS variable so main has spacing below header
+        (function(){
+            var hdr = document.getElementById('site-header');
+            if(!hdr) return;
+            function updateHeader(){
+                var h = Math.ceil(hdr.getBoundingClientRect().height) || 56;
+                document.documentElement.style.setProperty('--site-header-height', h + 'px');
+            }
+            updateHeader();
+            window.addEventListener('resize', updateHeader, {passive:true});
+            if(window.ResizeObserver){
+                try{ new ResizeObserver(updateHeader).observe(hdr);}catch(e){}
+            }
+        })();
+    </script>
+    <script>
+        // Robust smart-hide header for embed: hide on scroll down (past threshold), always show on scroll up
+        (function(){
+            const hdr = document.getElementById('site-header');
+            if(!hdr) return;
+            let prev = window.scrollY || 0;
+            let ticking = false;
+            const hideThreshold = 100;
+
+            function onScroll(){
+                const curr = window.scrollY || 0;
+                const delta = curr - prev;
+                if(delta > 0 && curr > hideThreshold){
+                    hdr.style.willChange = 'transform';
+                    hdr.style.transform = 'translateY(-100%)';
+                    hdr.style.transition = 'transform 220ms ease';
+                } else if(delta < 0){
+                    hdr.style.willChange = 'transform';
+                    hdr.style.transform = 'translateY(0)';
+                    hdr.style.transition = 'transform 180ms ease';
+                }
+                prev = curr;
+                if(curr === 0){ hdr.style.transform = ''; }
+            }
+
+            window.addEventListener('scroll', function(){
+                if(!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
+            }, {passive:true});
+            window.addEventListener('touchstart', function(e){ lastTouchY = e.touches[0].clientY; }, {passive:true});
+            window.addEventListener('touchmove', function(e){
+                var ty = e.touches[0].clientY; if(typeof lastTouchY === 'undefined') lastTouchY = ty; if(ty - lastTouchY > 5) { hdr.style.transform = 'translateY(0)'; }
+            }, {passive:true});
+        })();
+    </script>
 </body>
 </html>

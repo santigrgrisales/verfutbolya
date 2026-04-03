@@ -14,7 +14,7 @@
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
-    <header class="fixed top-0 w-full z-50 glass-panel border-b border-slate-800/50">
+    <header id="site-header" class="site-header w-full z-50 glass-panel border-b border-slate-800/50">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="/" class="flex items-center gap-3 group">
                 <div class="w-8 h-8 rounded bg-indigo-600 flex items-center justify-center shadow-lg group-hover:bg-indigo-500 transition">
@@ -35,7 +35,12 @@
         </div>
     </header>
 
-    <main class="flex-grow pt-28 pb-16 px-6 max-w-5xl mx-auto w-full">
+    <main class="flex-grow pb-16 px-6 max-w-5xl mx-auto w-full">
+        {% if not (availability.get('Futbol Libre') or availability.get('Tarjeta Roja') or availability.get('PlayerHD')) %}
+        <div class="glass-panel text-center p-8 rounded-xl mb-8">
+            <p class="text-slate-400 text-sm">No hay eventos disponibles en este momento. Por favor intenta de nuevo más tarde.</p>
+        </div>
+        {% endif %}
         <div class="mb-12">
             <div class="flex items-center gap-2 mb-3">
                 <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -85,7 +90,7 @@
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="contenedor-opcion2" class="hidden space-y-4">
@@ -113,7 +118,7 @@
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="contenedor-opcion3" class="hidden space-y-4">
@@ -141,7 +146,7 @@
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="faq" class="mt-20">
@@ -229,6 +234,82 @@
             else if(availability.tr) cambiarPestana('opcion2');
             else if(availability.ph) cambiarPestana('opcion3');
         });
+    </script>
+
+    <script>
+        // Toggle header scrolled state to increase opacity and prevent content bleeding
+        (function(){
+            var hdr = document.getElementById('site-header');
+            if(!hdr) return;
+            function onScroll(){
+                if(window.scrollY > 8) hdr.classList.add('scrolled'); else hdr.classList.remove('scrolled');
+            }
+            window.addEventListener('scroll', onScroll, {passive:true});
+            // initial state
+            onScroll();
+        })();
+    </script>
+    <script>
+        // Measure header height and set CSS variable to ensure main has enough top padding
+        (function(){
+            var hdr = document.getElementById('site-header');
+            if(!hdr) return;
+            function updateHeader(){
+                var h = Math.ceil(hdr.getBoundingClientRect().height) || 64;
+                document.documentElement.style.setProperty('--site-header-height', h + 'px');
+            }
+            updateHeader();
+            window.addEventListener('resize', updateHeader, {passive:true});
+            if(window.ResizeObserver){
+                try{ new ResizeObserver(updateHeader).observe(hdr);}catch(e){}
+            }
+        })();
+    </script>
+<script>
+        // Smart-hide restored - bulletproof peak tracking (now with fixed positioning)
+        (function(){
+            const hdr = document.getElementById('site-header');
+            if(!hdr) return;
+            let maxScrollY = 0;
+            let rafPending = false;
+
+            function updateHeader() {
+                const curr = window.scrollY || 0;
+                rafPending = false;
+                console.log('scroll', curr, 'max', maxScrollY); // debug optional
+                
+                if (curr > maxScrollY + 5) {
+                    maxScrollY = curr;
+                    hdr.style.transform = 'translateY(-100%)';
+                } else if (curr < maxScrollY || curr < 150) {
+                    hdr.style.transform = 'translateY(0)';
+                }
+                if (curr === 0) {
+                    hdr.style.transform = '';
+                    maxScrollY = 0;
+                }
+            }
+
+            function rafScroll() {
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(updateHeader);
+                }
+            }
+
+            window.addEventListener('scroll', rafScroll, { passive: true });
+            window.addEventListener('wheel', (e) => { if (e.deltaY < 0) hdr.style.transform = 'translateY(0)'; }, { passive: true });
+
+            let touchStartY = 0;
+            window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (touchStartY - e.touches[0].clientY > 10) hdr.style.transform = 'translateY(0)';
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            updateHeader();
+            console.log('Smart-hide ENABLED');
+        })();
     </script>
 </body>
 </html>
