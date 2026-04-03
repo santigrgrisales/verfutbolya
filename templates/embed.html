@@ -65,47 +65,37 @@
         })();
     </script>
     <script>
-        // Enhanced smart-hide: listen to window scroll, wheel, touch and internal scrollable containers
+        // Robust smart-hide header for embed: hide on scroll down (past threshold), always show on scroll up
         (function(){
             const hdr = document.getElementById('site-header');
             if(!hdr) return;
             let prev = window.scrollY || 0;
+            let ticking = false;
             const hideThreshold = 100;
 
-            function show(){ hdr.style.willChange='transform'; hdr.style.transform='translateY(0)'; hdr.style.transition='transform 180ms ease'; }
-            function hide(){ hdr.style.willChange='transform'; hdr.style.transform='translateY(-100%)'; hdr.style.transition='transform 220ms ease'; }
-
-            function onWindowScroll(){
-                const curr = window.scrollY || 0; const delta = curr - prev;
-                if(delta > 0 && curr > hideThreshold) hide();
-                else if(delta < 0) show();
+            function onScroll(){
+                const curr = window.scrollY || 0;
+                const delta = curr - prev;
+                if(delta > 0 && curr > hideThreshold){
+                    hdr.style.willChange = 'transform';
+                    hdr.style.transform = 'translateY(-100%)';
+                    hdr.style.transition = 'transform 220ms ease';
+                } else if(delta < 0){
+                    hdr.style.willChange = 'transform';
+                    hdr.style.transform = 'translateY(0)';
+                    hdr.style.transition = 'transform 180ms ease';
+                }
                 prev = curr;
+                if(curr === 0){ hdr.style.transform = ''; }
             }
-            window.addEventListener('scroll', onWindowScroll, {passive:true});
 
-            window.addEventListener('wheel', function(e){ if(e.deltaY < 0) show(); else if((window.scrollY||0) > hideThreshold) hide(); }, {passive:true});
-
-            let lastTouchY = null;
-            window.addEventListener('touchstart', e=> lastTouchY = e.touches[0] && e.touches[0].clientY, {passive:true});
-            window.addEventListener('touchmove', e=>{
-                const y = e.touches[0] && e.touches[0].clientY; if(lastTouchY==null) lastTouchY = y; const d = y - lastTouchY;
-                if(d > 5) show(); else if(d < -5 && (window.scrollY||0) > hideThreshold) hide(); lastTouchY = y;
+            window.addEventListener('scroll', function(){
+                if(!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
             }, {passive:true});
-
-            function attachScrollables(){
-                const all = Array.from(document.querySelectorAll('*'));
-                all.forEach(el => {
-                    try{
-                        const style = getComputedStyle(el); if(!(style.overflowY === 'auto' || style.overflowY === 'scroll')) return;
-                        if(el._hdrAttached) return; el._hdrAttached = true; el._prevScroll = el.scrollTop;
-                        el.addEventListener('scroll', function(){ const d = el.scrollTop - (el._prevScroll||0); if(d < 0) show(); el._prevScroll = el.scrollTop; }, {passive:true});
-                    }catch(e){}
-                });
-            }
-            attachScrollables();
-            new MutationObserver(attachScrollables).observe(document.body, {childList:true, subtree:true});
-
-            window.addEventListener('click', ()=> show(), {passive:true});
+            window.addEventListener('touchstart', function(e){ lastTouchY = e.touches[0].clientY; }, {passive:true});
+            window.addEventListener('touchmove', function(e){
+                var ty = e.touches[0].clientY; if(typeof lastTouchY === 'undefined') lastTouchY = ty; if(ty - lastTouchY > 5) { hdr.style.transform = 'translateY(0)'; }
+            }, {passive:true});
         })();
     </script>
 </body>

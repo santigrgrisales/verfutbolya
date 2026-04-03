@@ -36,6 +36,11 @@
     </header>
 
     <main class="flex-grow pb-16 px-6 max-w-5xl mx-auto w-full">
+        {% if not (availability.get('Futbol Libre') or availability.get('Tarjeta Roja') or availability.get('PlayerHD')) %}
+        <div class="glass-panel text-center p-8 rounded-xl mb-8">
+            <p class="text-slate-400 text-sm">No hay eventos disponibles en este momento. Por favor intenta de nuevo más tarde.</p>
+        </div>
+        {% endif %}
         <div class="mb-12">
             <div class="flex items-center gap-2 mb-3">
                 <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -48,61 +53,22 @@
         <div class="flex flex-wrap gap-3 mb-10 border-b border-slate-800 pb-4">
             {% if availability['Futbol Libre'] %}
             <button id="btn-opcion1" onclick="cambiarPestana('opcion1')" class="tab-btn active px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Principal</button>
-            <script>
-                // Enhanced smart-hide: listen to window scroll, wheel, touch and internal scrollable containers
-                (function(){
-                    const hdr = document.getElementById('site-header');
-                    if(!hdr) return;
-                    let prev = window.scrollY || 0;
-                    const hideThreshold = 100;
-
-                    function show(){ hdr.style.willChange='transform'; hdr.style.transform='translateY(0)'; hdr.style.transition='transform 180ms ease'; }
-                    function hide(){ hdr.style.willChange='transform'; hdr.style.transform='translateY(-100%)'; hdr.style.transition='transform 220ms ease'; }
-
-                    function onWindowScroll(){
-                        const curr = window.scrollY || 0; const delta = curr - prev;
-                        if(delta > 0 && curr > hideThreshold) hide();
-                        else if(delta < 0) show();
-                        prev = curr;
-                    }
-                    window.addEventListener('scroll', onWindowScroll, {passive:true});
-
-                    window.addEventListener('wheel', function(e){ if(e.deltaY < 0) show(); else if((window.scrollY||0) > hideThreshold) hide(); }, {passive:true});
-
-                    let lastTouchY = null;
-                    window.addEventListener('touchstart', e=> lastTouchY = e.touches[0] && e.touches[0].clientY, {passive:true});
-                    window.addEventListener('touchmove', e=>{
-                        const y = e.touches[0] && e.touches[0].clientY; if(lastTouchY==null) lastTouchY = y; const d = y - lastTouchY;
-                        if(d > 5) show(); else if(d < -5 && (window.scrollY||0) > hideThreshold) hide(); lastTouchY = y;
-                    }, {passive:true});
-
-                    // Attach scroll listeners to scrollable containers so upward scroll inside them shows header
-                    function attachScrollables(){
-                        const all = Array.from(document.querySelectorAll('*'));
-                        all.forEach(el => {
-                            try{
-                                const style = getComputedStyle(el); if(!(style.overflowY === 'auto' || style.overflowY === 'scroll')) return;
-                                if(el._hdrAttached) return; el._hdrAttached = true; el._prevScroll = el.scrollTop;
-                                el.addEventListener('scroll', function(){ const d = el.scrollTop - (el._prevScroll||0); if(d < 0) show(); el._prevScroll = el.scrollTop; }, {passive:true});
-                            }catch(e){}
-                        });
-                    }
-                    attachScrollables();
-                    new MutationObserver(attachScrollables).observe(document.body, {childList:true, subtree:true});
-
-                    // Fallback: any user click should reveal header
-                    window.addEventListener('click', ()=> show(), {passive:true});
-                })();
-            </script>
+            {% endif %}
+            {% if availability['Tarjeta Roja'] %}
+            <button id="btn-opcion2" onclick="cambiarPestana('opcion2')" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Alterno 1</button>
+            {% endif %}
+            {% if availability.get('PlayerHD') %}
+            <button id="btn-opcion3" onclick="cambiarPestana('opcion3')" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Alterno 2</button>
             {% endif %}
         </div>
+
         <div id="contenedor-opcion1" class="space-y-4">
             {% set ns = namespace(found=false) %}
             {% for match in matches %}{% if match.source == 'Futbol Libre' %}{% set ns.found = true %}
             <div class="glass-panel hover-card rounded-xl overflow-hidden cursor-pointer" onclick="this.querySelector('.links-container').classList.toggle('hidden')">
                 <div class="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-1.5 h-10 bg-slate-500 rounded-full"></div>
+                        <div class="w-1.5 h-10 bg-indigo-500 rounded-full"></div>
                         <h3 class="text-lg font-semibold text-slate-100">{{ match.match_name }}</h3>
                     </div>
                     <div class="flex items-center gap-6 justify-between md:justify-end">
@@ -114,14 +80,17 @@
                     <div class="col-span-full pb-2"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fuentes de reproducción</span></div>
                     {% for opcion in match.options %}
                     <a href="#" class="redirect-link flex justify-between items-center bg-slate-900/50 p-4 rounded-lg border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
-                        <span class="flex items-center gap-3 text-sm font-medium text-slate-300 group-hover:text-slate-100"><svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>{{ opcion.name }}</span>
+                        <span class="flex items-center gap-3 text-sm font-medium text-slate-300 group-hover:text-slate-100">
+                            <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            {{ opcion.name }}
+                        </span>
                         <svg class="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                     </a>
                     {% endfor %}
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="contenedor-opcion2" class="hidden space-y-4">
@@ -149,7 +118,7 @@
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="contenedor-opcion3" class="hidden space-y-4">
@@ -177,7 +146,7 @@
                 </div>
             </div>
             {% endif %}{% endfor %}
-            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
+            {% if not ns.found %}{% endif %}
         </div>
 
         <div id="faq" class="mt-20">
@@ -296,41 +265,50 @@
             }
         })();
     </script>
-    <script>
-        // Robust smart-hide header: hide on scroll down (past threshold), always show on any scroll up
+<script>
+        // Smart-hide restored - bulletproof peak tracking (now with fixed positioning)
         (function(){
             const hdr = document.getElementById('site-header');
             if(!hdr) return;
-            let prev = window.scrollY || 0;
-            let ticking = false;
-            const hideThreshold = 100; // start hiding only after this scroll
+            let maxScrollY = 0;
+            let rafPending = false;
 
-            function onScroll(){
+            function updateHeader() {
                 const curr = window.scrollY || 0;
-                const delta = curr - prev;
-                if(delta > 0 && curr > hideThreshold){
-                    // scrolling down
-                    hdr.style.willChange = 'transform';
+                rafPending = false;
+                console.log('scroll', curr, 'max', maxScrollY); // debug optional
+                
+                if (curr > maxScrollY + 5) {
+                    maxScrollY = curr;
                     hdr.style.transform = 'translateY(-100%)';
-                    hdr.style.transition = 'transform 220ms ease';
-                } else if(delta < 0){
-                    // scrolling up - always show (force explicit translateY(0))
-                    hdr.style.willChange = 'transform';
+                } else if (curr < maxScrollY || curr < 150) {
                     hdr.style.transform = 'translateY(0)';
-                    hdr.style.transition = 'transform 180ms ease';
                 }
-                prev = curr;
-                if(curr === 0){ hdr.style.transform = ''; }
+                if (curr === 0) {
+                    hdr.style.transform = '';
+                    maxScrollY = 0;
+                }
             }
 
-            window.addEventListener('scroll', function(){
-                if(!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
-            }, {passive:true});
-            // Mobile: also reveal header on touch start if user moves upward
-            window.addEventListener('touchstart', function(e){ lastTouchY = e.touches[0].clientY; }, {passive:true});
-            window.addEventListener('touchmove', function(e){
-                var ty = e.touches[0].clientY; if(typeof lastTouchY === 'undefined') lastTouchY = ty; if(ty - lastTouchY > 5) { hdr.style.transform = 'translateY(0)'; }
-            }, {passive:true});
+            function rafScroll() {
+                if (!rafPending) {
+                    rafPending = true;
+                    requestAnimationFrame(updateHeader);
+                }
+            }
+
+            window.addEventListener('scroll', rafScroll, { passive: true });
+            window.addEventListener('wheel', (e) => { if (e.deltaY < 0) hdr.style.transform = 'translateY(0)'; }, { passive: true });
+
+            let touchStartY = 0;
+            window.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
+            window.addEventListener('touchmove', (e) => {
+                if (touchStartY - e.touches[0].clientY > 10) hdr.style.transform = 'translateY(0)';
+                touchStartY = e.touches[0].clientY;
+            }, { passive: true });
+
+            updateHeader();
+            console.log('Smart-hide ENABLED');
         })();
     </script>
 </body>

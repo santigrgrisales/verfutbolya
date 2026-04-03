@@ -17,14 +17,15 @@ body{
   color:var(--color-text);
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
+  overscroll-behavior: none;
 }
 
 /* Header behavior: make header sticky (occupies flow) to avoid overlap
   and provide a scrolled state with stronger background to prevent text bleeding */
-#site-header{position:sticky; top:0; z-index:50; backdrop-filter: blur(8px);}
+#site-header{position:fixed; top:0; z-index:50; backdrop-filter: blur(8px); transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94); width:100%;}
 
 /* Reserve space under header: use measured header height + comfortable gap */
-main{padding-top:calc(var(--site-header-height,64px) + 16px)}
+main{padding-top:calc(var(--site-header-height, 80px) + 38px)}
 
 #site-header.scrolled{background:linear-gradient(180deg, rgba(15,23,30,0.95), rgba(6,15,20,0.95)); border-bottom:1px solid var(--color-border); box-shadow:0 6px 18px rgba(2,6,23,0.6)}
 
