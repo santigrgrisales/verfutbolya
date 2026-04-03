@@ -85,6 +85,15 @@ def embed_page():
 
     return render_template('embed.html', stream_url=stream_url, match_title=match_title)
 
+
+@app.route('/dmca')
+def dmca():
+    return render_template('dmca.html')
+
+@app.route('/privacy')
+def privacy():
+    return render_template('privacy.html')
+
 if __name__ == '__main__':
     # SOLUCIÓN: Forzamos a Flask a usar el puerto 8000 para evitar el conflicto con el PID 4
     app.run(debug=True, port=8000)

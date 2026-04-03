@@ -2,36 +2,50 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{{ match_title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>En Vivo | {{ match_title }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #0d1117; color: white; }
-        .player-wrap { max-width: 1200px; margin: 0 auto; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; margin: 0; }
+        .glass-header { background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(51, 65, 85, 0.5); }
     </style>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
-<body class="min-h-screen pt-8 pb-12">
-
-    <div class="container mx-auto px-4">
-        <div class="text-center mb-6">
-            <p class="text-green-500 text-sm font-bold tracking-widest uppercase mb-2">Reproductor embebido</p>
-            <h1 class="text-2xl font-bold">{{ match_title }}</h1>
-        </div>
-
-        <div class="player-wrap bg-black rounded-lg overflow-hidden shadow-lg">
-            <div class="w-full" style="height:64vh;">
-                <iframe src="{{ stream_url }}" frameborder="0" allowfullscreen class="w-full h-full"></iframe>
+<body class="min-h-screen flex flex-col">
+    
+    <header class="glass-header sticky top-0 z-50 w-full">
+        <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="javascript:history.back()" class="text-slate-400 hover:text-white transition flex items-center justify-center p-1.5 rounded-md hover:bg-slate-800">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                </a>
+                <div class="h-4 w-px bg-slate-700"></div>
+                <h1 class="text-sm font-semibold text-slate-200 truncate max-w-[200px] md:max-w-md">{{ match_title }}</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-xs font-medium text-indigo-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></span>
+                    Directo
+                </span>
             </div>
         </div>
+    </header>
 
-        <div class="mt-6 text-center">
-            <a href="{{ stream_url }}" target="_blank" class="text-sm text-gray-400 underline">Abrir en nueva pestaña</a>
+    <main class="flex-grow flex flex-col justify-center items-center p-4 md:p-6 w-full">
+        <div class="w-full max-w-5xl mx-auto bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-800 relative aspect-video">
+            <iframe src="{{ stream_url }}" frameborder="0" allowfullscreen class="absolute top-0 left-0 w-full h-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
         </div>
 
-        <div class="mt-6 text-center text-xs text-gray-500">
-            Esta web no aloja contenido; los enlaces son de terceros.
+        <div class="mt-6 flex flex-wrap justify-center gap-6 text-xs text-slate-500 font-medium">
+            <button onclick="location.reload();" class="flex items-center gap-1.5 hover:text-slate-300 transition">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                Recargar reproductor
+            </button>
+            <a href="/" class="flex items-center gap-1.5 hover:text-slate-300 transition">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+                Cambiar de fuente
+            </a>
         </div>
-    </div>
-
+    </main>
 </body>
 </html>

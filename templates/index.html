@@ -2,254 +2,240 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partidos en Vivo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>verfutbol Ya | Agenda Deportiva</title>
+    <meta name="description" content="Agenda deportiva actualizada. Transmisiones en alta calidad y rendimiento óptimo.">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #080808; color: white; font-family: sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass-panel { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(16px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .hover-card:hover { border-color: rgba(99, 102, 241, 0.4); transform: translateY(-2px); transition: all 0.3s ease; }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { background-color: #4f46e5; color: #ffffff; border-color: #6366f1; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39); }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="antialiased min-h-screen flex flex-col">
 
-    <div class="max-w-4xl mx-auto">
-        
-        <h1 class="text-2xl md:text-3xl font-bold text-center mb-2 text-gray-200 tracking-wide uppercase">
-            Programación de Hoy
-        </h1>
-        
-        <h2 class="text-center text-gray-400 text-sm md:text-base mb-8">
-            Si un stream falla, prueba otra opción disponible (Opción 1 / Opción 2 / Opción 3).
-        </h2>
+    <header class="fixed top-0 w-full z-50 glass-panel border-b border-slate-800/50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="w-8 h-8 rounded bg-indigo-600 flex items-center justify-center shadow-lg group-hover:bg-indigo-500 transition">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <span class="font-bold text-xl tracking-wide text-slate-100">verfutbol<span class="text-indigo-400">Ya</span></span>
+            </a>
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-slate-300">
+                <a href="/" class="hover:text-indigo-400 transition">Agenda</a>
+                <a href="#faq" class="hover:text-indigo-400 transition">FAQ</a>
+            </nav>
+            <div class="flex items-center gap-4">
+                <select id="language-select" class="bg-slate-900 border border-slate-700 text-slate-300 rounded-md text-sm px-3 py-1.5 focus:outline-none focus:border-indigo-500">
+                    <option value="es">ES</option>
+                    <option value="en">EN</option>
+                </select>
+            </div>
+        </div>
+    </header>
 
-        <div class="flex justify-center space-x-4 mb-8 border-b border-gray-800 pb-4">
+    <main class="flex-grow pt-28 pb-16 px-6 max-w-5xl mx-auto w-full">
+        <div class="mb-12">
+            <div class="flex items-center gap-2 mb-3">
+                <svg class="w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                <span id="current-date" class="text-sm font-medium text-indigo-400 tracking-wider uppercase"></span>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-100 mb-4 tracking-tight">Encuentros Programados</h1>
+            <p class="text-slate-400 text-lg">Selecciona un evento de la agenda para acceder a las opciones de transmisión disponibles.</p>
+        </div>
+
+        <div class="flex flex-wrap gap-3 mb-10 border-b border-slate-800 pb-4">
             {% if availability['Futbol Libre'] %}
-            <button id="btn-opcion1" onclick="cambiarPestana('opcion1')" 
-                    class="px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200">
-                Opción 1
-            </button>
+            <button id="btn-opcion1" onclick="cambiarPestana('opcion1')" class="tab-btn active px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Principal</button>
             {% endif %}
-
             {% if availability['Tarjeta Roja'] %}
-            <button id="btn-opcion2" onclick="cambiarPestana('opcion2')" 
-                    class="px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200">
-                Opción 2
-            </button>
+            <button id="btn-opcion2" onclick="cambiarPestana('opcion2')" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Alterno 1</button>
             {% endif %}
-
             {% if availability.get('PlayerHD') %}
-            <button id="btn-opcion3" onclick="cambiarPestana('opcion3')" 
-                    class="px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200">
-                Opción 3
-            </button>
+            <button id="btn-opcion3" onclick="cambiarPestana('opcion3')" class="tab-btn px-6 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 bg-slate-800 text-slate-300">Servidor Alterno 2</button>
             {% endif %}
         </div>
 
-        <div id="contenedor-opcion1" class="block">
-            {% set hay_opcion1 = false %}
-            
-            {% for match in matches %}
-                {% if match.source == 'Futbol Libre' %}
-                    {% set hay_opcion1 = true %}
-                    <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
-                        <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
-                             onclick="document.getElementById('links-1-{{ loop.index }}').classList.toggle('hidden')">
-                            <div class="flex items-center space-x-4 w-3/4">
-                                <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
-                            </div>
-                            <div class="flex items-center justify-end space-x-3 w-1/4">
-                                <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-
-                        <div id="links-1-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
-                            <div class="space-y-2">
-                                {% for opcion in match.options %}
-                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="text-green-500 text-xs">((•))</span>
-                                        <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
-                                    </div>
-                                    <div class="bg-[#1a1a1a] group-hover:bg-green-600 transition p-1.5 rounded text-gray-400 group-hover:text-white">
-                                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
+        <div id="contenedor-opcion1" class="space-y-4">
+            {% set ns = namespace(found=false) %}
+            {% for match in matches %}{% if match.source == 'Futbol Libre' %}{% set ns.found = true %}
+            <div class="glass-panel hover-card rounded-xl overflow-hidden cursor-pointer" onclick="this.querySelector('.links-container').classList.toggle('hidden')">
+                <div class="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-1.5 h-10 bg-indigo-500 rounded-full"></div>
+                        <h3 class="text-lg font-semibold text-slate-100">{{ match.match_name }}</h3>
                     </div>
-                {% endif %}
-            {% endfor %}
-
-            {% if not matches %}
-                <div class="text-center p-10 bg-[#111111] rounded-xl border border-gray-800"><p class="text-gray-400">Buscando partidos disponibles...</p></div>
-            {% endif %}
+                    <div class="flex items-center gap-6 justify-between md:justify-end">
+                        <span class="bg-slate-900/80 px-4 py-1.5 rounded-md text-slate-300 font-mono text-sm border border-slate-700">{{ match.match_time }}</span>
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <div class="links-container hidden p-6 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/50 mt-2">
+                    <div class="col-span-full pb-2"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fuentes de reproducción</span></div>
+                    {% for opcion in match.options %}
+                    <a href="#" class="redirect-link flex justify-between items-center bg-slate-900/50 p-4 rounded-lg border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
+                        <span class="flex items-center gap-3 text-sm font-medium text-slate-300 group-hover:text-slate-100">
+                            <svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                            {{ opcion.name }}
+                        </span>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}{% endfor %}
+            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
         </div>
 
-
-        <div id="contenedor-maspartidos" class="hidden">
-            {% set hay_mas = false %}
-            
-            {% for match in matches %}
-                {% if match.source == 'Tarjeta Roja' %}
-                    {% set hay_mas = true %}
-                    <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
-                        <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
-                             onclick="document.getElementById('links-2-{{ loop.index }}').classList.toggle('hidden')">
-                            <div class="flex items-center space-x-4 w-3/4">
-                                <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
-                            </div>
-                            <div class="flex items-center justify-end space-x-3 w-1/4">
-                                <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-
-                        <div id="links-2-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
-                            <div class="space-y-2">
-                                {% for opcion in match.options %}
-                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="text-green-500 text-xs">((•))</span>
-                                        <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
-                                    </div>
-                                    <div class="bg-[#1a1a1a] group-hover:bg-green-600 transition p-1.5 rounded text-gray-400 group-hover:text-white">
-                                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
+        <div id="contenedor-opcion2" class="hidden space-y-4">
+            {% set ns = namespace(found=false) %}
+            {% for match in matches %}{% if match.source == 'Tarjeta Roja' %}{% set ns.found = true %}
+            <div class="glass-panel hover-card rounded-xl overflow-hidden cursor-pointer" onclick="this.querySelector('.links-container').classList.toggle('hidden')">
+                <div class="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-1.5 h-10 bg-slate-500 rounded-full"></div>
+                        <h3 class="text-lg font-semibold text-slate-100">{{ match.match_name }}</h3>
                     </div>
-                {% endif %}
-            {% endfor %}
+                    <div class="flex items-center gap-6 justify-between md:justify-end">
+                        <span class="bg-slate-900/80 px-4 py-1.5 rounded-md text-slate-300 font-mono text-sm border border-slate-700">{{ match.match_time }}</span>
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <div class="links-container hidden p-6 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/50 mt-2">
+                    <div class="col-span-full pb-2"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fuentes de reproducción</span></div>
+                    {% for opcion in match.options %}
+                    <a href="#" class="redirect-link flex justify-between items-center bg-slate-900/50 p-4 rounded-lg border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
+                        <span class="flex items-center gap-3 text-sm font-medium text-slate-300 group-hover:text-slate-100"><svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>{{ opcion.name }}</span>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}{% endfor %}
+            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
         </div>
 
-        <div id="contenedor-opcion3" class="hidden">
-            {% set hay_opcion3 = false %}
-            {% for match in matches %}
-                {% if match.source == 'PlayerHD' %}
-                    {% set hay_opcion3 = true %}
-                    <div class="bg-[#111111] border border-gray-800 rounded-xl mb-4 overflow-hidden shadow-lg">
-                        <div class="p-4 md:p-5 flex justify-between items-center cursor-pointer hover:bg-[#1a1a1a] transition duration-200"
-                             onclick="document.getElementById('links-3-{{ loop.index }}').classList.toggle('hidden')">
-                            <div class="flex items-center space-x-4 w-3/4">
-                                <span class="font-bold text-base md:text-lg text-gray-200">{{ match.match_name }}</span>
-                            </div>
-                            <div class="flex items-center justify-end space-x-3 w-1/4">
-                                <span class="px-3 py-1 text-xs font-semibold bg-[#1a1a1a] text-green-500 rounded-md border border-gray-800">{{ match.match_time }}</span>
-                                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
-
-                        <div id="links-3-{{ loop.index }}" class="hidden border-t border-gray-800 bg-[#0a0a0a] p-4 md:p-5">
-                            {% if match.match_time == 'Enlace externo' or match.match_name.startswith('External:') %}
-                            <div class="mb-3 text-sm text-yellow-300 bg-[#1a1a1a] p-3 rounded">Nota: PlayerHD resuelve el iframe en la página del partido; haz clic para abrir el stream (resolución perezosa).</div>
-                            {% endif %}
-                            <div class="space-y-2">
-                                {% for opcion in match.options %}
-                                <a href="#" class="redirect-link flex justify-between items-center bg-[#111111] p-3 rounded-lg hover:bg-[#1a1a1a] border border-gray-800 hover:border-gray-700 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
-                                    <div class="flex items-center space-x-3">
-                                        <span class="text-green-500 text-xs">((•))</span>
-                                        <span class="text-sm font-medium text-gray-300 group-hover:text-white">{{ opcion.name }}</span>
-                                    </div>
-                                    <div class="bg-[#1a1a1a] group-hover:bg-green-600 transition p-1.5 rounded text-gray-400 group-hover:text-white">
-                                        <svg class="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                        </div>
+        <div id="contenedor-opcion3" class="hidden space-y-4">
+            {% set ns = namespace(found=false) %}
+            {% for match in matches %}{% if match.source == 'PlayerHD' %}{% set ns.found = true %}
+            <div class="glass-panel hover-card rounded-xl overflow-hidden cursor-pointer" onclick="this.querySelector('.links-container').classList.toggle('hidden')">
+                <div class="p-6 flex flex-col md:flex-row justify-between md:items-center gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-1.5 h-10 bg-slate-500 rounded-full"></div>
+                        <h3 class="text-lg font-semibold text-slate-100">{{ match.match_name }}</h3>
                     </div>
-                {% endif %}
-            {% endfor %}
+                    <div class="flex items-center gap-6 justify-between md:justify-end">
+                        <span class="bg-slate-900/80 px-4 py-1.5 rounded-md text-slate-300 font-mono text-sm border border-slate-700">{{ match.match_time }}</span>
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <div class="links-container hidden p-6 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-800/50 mt-2">
+                    <div class="col-span-full pb-2"><span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Fuentes de reproducción</span></div>
+                    {% for opcion in match.options %}
+                    <a href="#" class="redirect-link flex justify-between items-center bg-slate-900/50 p-4 rounded-lg border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/50 transition group" data-url="{{ opcion.link }}" data-match="{{ match.match_name }}" data-src="{{ match.source_id }}">
+                        <span class="flex items-center gap-3 text-sm font-medium text-slate-300 group-hover:text-slate-100"><svg class="w-4 h-4 text-indigo-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>{{ opcion.name }}</span>
+                        <svg class="w-4 h-4 text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}{% endfor %}
+            {% if not ns.found %}<div class="glass-panel text-center p-12 rounded-xl"><p class="text-slate-400 text-sm">No hay eventos listados en este servidor actualmente.</p></div>{% endif %}
         </div>
 
-    </div>
+        <div id="faq" class="mt-20">
+            <h2 class="text-2xl font-bold mb-8 text-slate-100">Preguntas Frecuentes</h2>
+            <div class="space-y-3">
+                <div class="glass-panel rounded-lg overflow-hidden">
+                    <button class="faq-question w-full text-left p-5 font-medium text-sm flex justify-between items-center text-slate-200">
+                        ¿Cómo aseguro la mejor calidad de reproducción?
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-800 pt-4 mt-2">Recomendamos utilizar una conexión estable a internet. Si un canal presenta interrupciones, intenta recargar la página del reproductor o selecciona una fuente alternativa desde esta agenda principal.</div>
+                </div>
+                <div class="glass-panel rounded-lg overflow-hidden">
+                    <button class="faq-question w-full text-left p-5 font-medium text-sm flex justify-between items-center text-slate-200">
+                        ¿Es necesario crear una cuenta?
+                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="faq-answer hidden px-5 pb-5 text-slate-400 text-sm leading-relaxed border-t border-slate-800 pt-4 mt-2">No. El acceso a la agenda y a las herramientas de redirección es completamente libre y no requiere registro de datos personales.</div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-        <script id="scrapers-availability" type="application/json">
-        {{ {"fl": availability.get('Futbol Libre', False), "tr": availability.get('Tarjeta Roja', False), "ph": availability.get('PlayerHD', False)} | tojson }}
-    </script>
+    <footer class="glass-panel border-t border-slate-800/50 py-8 mt-auto">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-xs font-medium text-slate-500">
+            <p>&copy; 2026 verfutbolYa. Panel de navegación deportiva.</p>
+            <div class="flex gap-6">
+                <a href="/dmca" class="hover:text-slate-300 transition">DMCA</a>
+                <a href="/privacy" class="hover:text-slate-300 transition">Privacidad</a>
+            </div>
+        </div>
+    </footer>
 
+    <script id="scrapers-availability" type="application/json">{{ {"fl": availability.get('Futbol Libre', False), "tr": availability.get('Tarjeta Roja', False), "ph": availability.get('PlayerHD', False)} | tojson }}</script>
     <script>
-        // Parse availability JSON from a non-JS script tag to avoid editor/linters parsing Jinja
-        const scrapersAvailability = JSON.parse(document.getElementById('scrapers-availability').textContent || '{}');
+        const availability = JSON.parse(document.getElementById('scrapers-availability').textContent);
+        
+        // Date formatting
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', dateOptions);
 
-        // Send redirect params via POST to avoid exposing target URL in browser address bar
-        function postRedirect(url, match, src) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/redirect';
-            function add(name, value) {
-                const inp = document.createElement('input');
-                inp.type = 'hidden';
-                inp.name = name;
-                inp.value = value || '';
-                form.appendChild(inp);
-            }
-            add('url', url);
-            add('match', match);
-            add('src', src);
-            document.body.appendChild(form);
-            form.submit();
+        function postRedirect(url, match, src) { 
+            let f = document.createElement('form'); 
+            f.method = 'POST'; 
+            f.action = '/redirect'; 
+            let a = (n,v) => { let i = document.createElement('input'); i.type = 'hidden'; i.name = n; i.value = v; f.appendChild(i) }; 
+            a('url', url); a('match', match); a('src', src); 
+            document.body.appendChild(f); 
+            f.submit(); 
         }
 
-        // Delegated click handler for links with `redirect-link` class.
-        document.addEventListener('click', function (ev) {
-            const a = ev.target.closest && ev.target.closest('.redirect-link');
-            if (!a) return;
-            ev.preventDefault();
-            const url = a.getAttribute('data-url') || '';
-            const match = a.getAttribute('data-match') || '';
-            const src = a.getAttribute('data-src') || '';
-            postRedirect(url, match, src);
+        document.addEventListener('click', e => { 
+            let a = e.target.closest('.redirect-link'); 
+            if(a) { e.preventDefault(); postRedirect(a.dataset.url, a.dataset.match, a.dataset.src); } 
         });
 
-        function cambiarPestana(pestana) {
-                const contOpcion1 = document.getElementById('contenedor-opcion1');
-                const contMasPartidos = document.getElementById('contenedor-maspartidos');
-                const contOpcion3 = document.getElementById('contenedor-opcion3');
-                const btnOpcion1 = document.getElementById('btn-opcion1');
-                const btnMasPartidos = document.getElementById('btn-opcion2');
-                const btnOpcion3 = document.getElementById('btn-opcion3');
-
-            const claseActivo = "px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow-lg shadow-green-900/20 transition duration-200";
-            const claseInactivo = "px-6 py-2 bg-[#1a1a1a] text-gray-400 hover:text-white font-bold rounded-lg hover:bg-[#2a2a2a] transition duration-200";
-
-            if (pestana === 'opcion1') {
-                if (contOpcion1) contOpcion1.classList.remove('hidden');
-                if (contMasPartidos) contMasPartidos.classList.add('hidden');
-                if (contOpcion3) contOpcion3.classList.add('hidden');
-                if (btnOpcion1) btnOpcion1.className = claseActivo;
-                if (btnMasPartidos) btnMasPartidos.className = claseInactivo;
-                if (btnOpcion3) btnOpcion3.className = claseInactivo;
-            } else if (pestana === 'opcion2') {
-                if (contOpcion1) contOpcion1.classList.add('hidden');
-                if (contMasPartidos) contMasPartidos.classList.remove('hidden');
-                if (contOpcion3) contOpcion3.classList.add('hidden');
-                if (btnOpcion1) btnOpcion1.className = claseInactivo;
-                if (btnMasPartidos) btnMasPartidos.className = claseActivo;
-                if (btnOpcion3) btnOpcion3.className = claseInactivo;
-            } else if (pestana === 'opcion3') {
-                if (contOpcion1) contOpcion1.classList.add('hidden');
-                if (contMasPartidos) contMasPartidos.classList.add('hidden');
-                if (contOpcion3) contOpcion3.classList.remove('hidden');
-                if (btnOpcion1) btnOpcion1.className = claseInactivo;
-                if (btnMasPartidos) btnMasPartidos.className = claseInactivo;
-                if (btnOpcion3) btnOpcion3.className = claseActivo;
-            }
+        function cambiarPestana(p) {
+            let tabs = ['opcion1', 'opcion2', 'opcion3'];
+            tabs.forEach(tab => {
+                let container = document.getElementById(`contenedor-${tab}`);
+                let btn = document.getElementById(`btn-${tab}`);
+                if (container && btn) {
+                    if (tab === p) {
+                        container.classList.remove('hidden');
+                        btn.classList.add('active');
+                        btn.classList.replace('text-slate-300', 'text-white');
+                    } else {
+                        container.classList.add('hidden');
+                        btn.classList.remove('active');
+                        btn.classList.replace('text-white', 'text-slate-300');
+                    }
+                }
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', function(){
-            if (scrapersAvailability.fl) {
-                cambiarPestana('opcion1');
-            } else if (scrapersAvailability.tr) {
-                cambiarPestana('opcion2');
-            } else if (scrapersAvailability.ph) {
-                cambiarPestana('opcion3');
-            }
+        document.querySelectorAll('.faq-question').forEach(btn => {
+            btn.addEventListener('click', () => { 
+                let ans = btn.nextElementSibling; 
+                ans.classList.toggle('hidden'); 
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if(availability.fl) cambiarPestana('opcion1');
+            else if(availability.tr) cambiarPestana('opcion2');
+            else if(availability.ph) cambiarPestana('opcion3');
         });
     </script>
-
 </body>
 </html>
