@@ -1,0 +1,64 @@
+:root{
+  --color-bg:#071017;
+  --color-surface:#0B1720;
+  --color-surface-alt:#0F2430;
+  --color-primary:#16A34A; /* verde campo */
+  --color-accent:#F59E0B; /* dorado/CTA */
+  --color-text:#E6EEF3;
+  --color-muted:#9CA3AF;
+  --color-border:#1F2937;
+}
+
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background:var(--color-bg);
+  color:var(--color-text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* Headings use a display font */
+h1,h2,h3{font-family: "Montserrat", "Poppins", "Inter", system-ui, sans-serif}
+
+/* Panels and surfaces - translucent dark glass */
+.glass-panel{background:linear-gradient(180deg, rgba(11,23,30,0.65), rgba(6,15,20,0.6)); border:1px solid rgba(31,41,55,0.6);}
+
+/* Remap Tailwind-like utility classes used in templates to our palette (dark theme matches) */
+.bg-slate-900{background-color:transparent !important}
+.bg-slate-800{background-color:transparent !important}
+.text-slate-100{color:var(--color-text) !important}
+.text-slate-200{color:rgba(230,238,243,0.95) !important}
+.text-slate-300{color:var(--color-muted) !important}
+.text-slate-400{color:var(--color-muted) !important}
+.text-slate-500{color:var(--color-muted) !important}
+.text-slate-600{color:rgba(230,238,243,0.72) !important}
+.border-slate-800{border-color:rgba(31,41,55,0.6) !important}
+.border-slate-700{border-color:rgba(31,41,55,0.5) !important}
+.border-slate-800\/50{border-color:rgba(31,41,55,0.45) !important}
+
+/* Accent / primary */
+.text-indigo-400{color:var(--color-primary) !important}
+.bg-indigo-600{background-color:var(--color-primary) !important}
+.bg-indigo-500{background-color:var(--color-primary) !important}
+.bg-indigo-500\/10{background:linear-gradient(180deg, rgba(22,163,74,0.06), rgba(22,163,74,0.04)) !important}
+.border-indigo-500\/20{border-color:rgba(22,163,74,0.12) !important}
+.hover\:bg-indigo-500:hover{background-color:var(--color-primary) !important}
+
+/* Buttons */
+.btn-primary{background:var(--color-primary); color:#071017; border-radius:8px; padding:10px 14px; display:inline-block}
+.btn-cta{background:var(--color-accent); color:#071017}
+
+/* Embed container sensible constraints */
+.embed-container{width:100%; max-width:85%; margin:0 auto; aspect-ratio:16/9; background:#000; border-radius:8px; overflow:hidden}
+
+/* Small helpers */
+.text-muted{color:var(--color-muted)}
+.glass-header{background:linear-gradient(180deg, rgba(11,23,30,0.8), rgba(6,15,20,0.75)); border-bottom:1px solid rgba(31,41,55,0.6)}
+
+/* Ensure form buttons that used Tailwind look coherent */
+.shadow-indigo-500\/20{box-shadow:0 10px 30px rgba(22,163,74,0.09)}
+
+/* Accessibility: focus styles */
+a:focus, button:focus, input:focus{outline:3px solid rgba(22,163,74,0.14); outline-offset:2px}
